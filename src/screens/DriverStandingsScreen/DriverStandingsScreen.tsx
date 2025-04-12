@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { View, FlatList } from "react-native";
+import { View, FlatList, ActivityIndicator } from "react-native";
 import { styles } from "./styles";
 import { f1ApiClient } from "../../api/f1api/httpClient";
 import DriverStandingCard from "../../components/ui/DriverStandingCard";
@@ -9,6 +9,7 @@ const DriverStandingsScreen = () => {
   const [driverStandings, setDriverStandings] = React.useState<
     DriverStanding[]
   >([]);
+  const [loading, setLoading] = React.useState(true);
 
   const fetchDriverStandings = async () => {
     try {
@@ -18,6 +19,8 @@ const DriverStandingsScreen = () => {
       setDriverStandings(driverStandings.drivers_championship);
     } catch (error) {
       console.error("Error fetching teams:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -27,17 +30,21 @@ const DriverStandingsScreen = () => {
 
   return (
     <View style={styles.root}>
-      <FlatList
-        data={driverStandings}
-        renderItem={({ item }) => (
-          <DriverStandingCard
-            driver={item.driver}
-            points={item.points}
-            position={item.position}
-            team={item.team}
-          />
-        )}
-      />
+      {loading ? (
+        <View style={styles.activityIndicator}>
+          <ActivityIndicator animating={loading} />
+        </View>
+      ) : (
+        <FlatList
+          data={driverStandings}
+          renderItem={({ item }) => <DriverStandingCard {...item} />}
+          keyExtractor={(item) => item.classificationId.toString()}
+          showsVerticalScrollIndicator={false}
+          ItemSeparatorComponent={() => (
+            <View style={styles.itemSeparatorComponent} />
+          )}
+        />
+      )}
     </View>
   );
 };
