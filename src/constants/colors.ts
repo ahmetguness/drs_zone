@@ -1,4 +1,13 @@
-export const COLORS: { [key: string]: string[] } = {
+export const colors = {
+  background: "#f1f3f5",
+  primaryText: "#1c1c1e",
+  secondaryText: "#6c757d",
+  highlight: "#e10600",
+  accent: "#2a9d8f",
+  card: "#ffffff",
+};
+
+export const TEAM_COLORS: { [key: string]: string[] } = {
   "Melbourne Grand Prix Circuit (Australia)": ["#003366", "#808080"], // Dark Blue, Gray
   "Bahrain International Circuit (Bahrain)": ["#F1E0C6", "#F4C430"], // Beige, Golden Yellow
   "Jeddah Street Circuit (Saudi Arabia)": ["#C0C0C0", "#1E90FF"], // Silver Gray, Blue

@@ -1,15 +1,4 @@
-interface Driver {
-  name: string;
-  surname: string;
-  nationality: string;
-  birthday: string;
-  number: number;
-  shortName: string;
-  url: string;
-}
-
 interface Team {
-  teamId: string;
   teamName: string;
   country: string;
   firstAppareance: number;
@@ -18,13 +7,11 @@ interface Team {
   url: string;
 }
 
-export interface DriverStanding {
+export interface TeamStanding {
   classificationId: number;
-  driverId: string;
   teamId: string;
   points: number;
   position: number;
   wins: number;
-  driver: Driver;
   team: Team;
 }

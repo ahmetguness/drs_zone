@@ -1,15 +1,13 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { View, FlatList, ActivityIndicator } from "react-native";
 import { styles } from "./styles";
 import { f1ApiClient } from "../../api/f1api/httpClient";
-import DriverStandingCard from "../../components/ui/DriverStandingCard";
+import DriverStandingCard from "../../components/ui/cards/DriverStandingCard";
 import { DriverStanding } from "../../types/models/StandingModels/DriverStanding";
 
 const DriverStandingsScreen = () => {
-  const [driverStandings, setDriverStandings] = React.useState<
-    DriverStanding[]
-  >([]);
-  const [loading, setLoading] = React.useState(true);
+  const [driverStandings, setDriverStandings] = useState<DriverStanding[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchDriverStandings = async () => {
     try {
