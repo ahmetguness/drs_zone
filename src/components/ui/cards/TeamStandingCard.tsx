@@ -12,12 +12,13 @@ import { teamStandingData } from "../../../data/data";
 import { colors } from "../../../constants/colors";
 
 const TeamStandingCard: React.FC<TeamStanding> = ({
+  teamId,
   position,
   points,
   wins,
   team,
 }) => {
-  const logoUrl = teamStandingData[team.teamName];
+  const logoUrl = teamStandingData[teamId];
 
   return (
     <Pressable
