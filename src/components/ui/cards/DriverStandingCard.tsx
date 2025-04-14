@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, Image } from "react-native";
 import React, { useEffect, useState } from "react";
 import { DriverStanding } from "../../../types/models/StandingModels/DriverStanding";
 import { colors } from "../../../constants/colors";
+import { getDriverImageUrl } from "../../../utils/getDriverImageUrl";
 
 const DriverStandingCard: React.FC<DriverStanding> = ({
   position,
@@ -12,12 +13,7 @@ const DriverStandingCard: React.FC<DriverStanding> = ({
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    const lastWordOfSurname = driver.surname
-      .trim()
-      .split(" ")
-      .pop()
-      ?.toUpperCase();
-    const url = `https://media.formula1.com/content/dam/fom-website/drivers/2025Drivers/${lastWordOfSurname}.jpg.transform/2col/image.jpg`;
+    const url = getDriverImageUrl(driver.surname);
     setImageUrl(url);
   }, [driver.surname]);
 
