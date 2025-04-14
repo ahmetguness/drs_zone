@@ -8,18 +8,22 @@ import CountryFlag from "react-native-country-flag";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { format, parseISO } from "date-fns";
 import { styles } from "./styles";
+import { useDispatch } from "react-redux";
+import { setCurrentYearRaces } from "../../hooks/redux_toolkit/Slices/RaceSlice";
 
 const CurrentWeekInfo = () => {
   const [loading, setLoading] = useState(true);
   const [selectedRace, setSelectedRace] = useState<Race | null>(null);
   const [isThisWeek, setIsThisWeek] = useState<boolean>(false);
+  const dispatcher = useDispatch();
 
   const fetchCurrentYearData = async () => {
     try {
       const response = await f1ApiClient.get<{ races: Race[] }>("/2025");
       const races = response.races;
-
+      dispatcher(setCurrentYearRaces(races));
       const thisWeekRace = filterRacesThisWeek(races);
+      console.log("bu", response);
       if (thisWeekRace.length > 0) {
         setSelectedRace(thisWeekRace[0]);
         setIsThisWeek(true);
@@ -39,7 +43,6 @@ const CurrentWeekInfo = () => {
     fetchCurrentYearData();
   }, []);
 
-  // Format time to local time
   const formatTime = (
     dateString: string | undefined,
     timeString: string | undefined

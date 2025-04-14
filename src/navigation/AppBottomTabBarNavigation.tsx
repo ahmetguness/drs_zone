@@ -2,7 +2,7 @@ import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import DriverStandingsScreen from "../screens/DriverStandingsScreen/DriverStandingsScreen";
 import TeamStandingsScreen from "../screens/TeamStandingsScreen/TeamStandingsScreen";
-import CurrentWeekInfo from "../screens/CurrentWeekInfo/CurrentWeekInfo";
+import CurrentWeekInfo from "../screens/CurrentWeekInfoScreen/CurrentWeekInfoScreen";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import ScheduleScreen from "../screens/ScheduleScreen/ScheduleScreen";
@@ -28,7 +28,22 @@ const AppBottomTabBarNavigation = () => {
           title: "The Race Ahead",
         }}
       />
-      <Tab.Screen name="ScheduleScreen" component={ScheduleScreen} />
+      <Tab.Screen
+        name="ScheduleScreen"
+        component={ScheduleScreen}
+        options={{
+          headerTitle: "Schedule",
+          headerTitleAlign: "center",
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons
+              name={focused ? "calendar" : "calendar-outline"}
+              size={size}
+              color={color}
+            />
+          ),
+          title: "Schedule",
+        }}
+      />
       <Tab.Screen
         name="DriverStandingsScreen"
         component={DriverStandingsScreen}
