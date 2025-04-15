@@ -10,6 +10,7 @@ import { format, parseISO } from "date-fns";
 import { styles } from "./styles";
 import { useDispatch } from "react-redux";
 import { setCurrentYearRaces } from "../../hooks/redux_toolkit/Slices/RaceSlice";
+import { Response } from "../../types/models/StandingModels/Response";
 
 const CurrentWeekInfo = () => {
   const [loading, setLoading] = useState(true);
@@ -19,11 +20,10 @@ const CurrentWeekInfo = () => {
 
   const fetchCurrentYearData = async () => {
     try {
-      const response = await f1ApiClient.get<{ races: Race[] }>("/2025");
+      const response = await f1ApiClient.get<Response>("/2025");
       const races = response.races;
       dispatcher(setCurrentYearRaces(races));
       const thisWeekRace = filterRacesThisWeek(races);
-      console.log("bu", response);
       if (thisWeekRace.length > 0) {
         setSelectedRace(thisWeekRace[0]);
         setIsThisWeek(true);

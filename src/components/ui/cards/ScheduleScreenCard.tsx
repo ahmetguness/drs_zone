@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Race } from "../../../types/models/StandingModels/CurrentYear";
 import { circuitData } from "../../../data/data";
 import CountryFlag from "react-native-country-flag";
@@ -29,7 +36,13 @@ const ScheduleScreenCard: React.FC<ScheduleScreenCardProps> = ({
   return (
     <TouchableOpacity
       style={[styles.card, isPastRace && styles.pastCard]}
-      onPress={onPress}
+      onPress={() => {
+        if (isPastRace) {
+          onPress();
+        } else {
+          Alert.alert("Warning, this race has not yet taken place.");
+        }
+      }}
     >
       <View style={styles.flagContainer}>
         <CountryFlag isoCode={circuitInfo.flag} size={24} />

@@ -1,4 +1,4 @@
-interface Driver {
+export interface Driver {
   name: string;
   surname: string;
   nationality: string;
@@ -8,7 +8,7 @@ interface Driver {
   url: string;
 }
 
-interface Team {
+export interface Team {
   teamId: string;
   teamName: string;
   country: string;

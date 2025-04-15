@@ -9,6 +9,7 @@ export interface Response {
   season: string;
   championship: Championship;
   races: Race[];
+  data: string;
 }
 
 interface Championship {
