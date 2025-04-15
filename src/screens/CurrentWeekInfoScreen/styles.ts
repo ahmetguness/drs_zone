@@ -42,6 +42,24 @@ export const styles = StyleSheet.create({
     color: "#666",
     marginLeft: 8,
   },
+  countdownContainer: {
+    marginTop: 15,
+    backgroundColor: "#1e1e1e",
+    borderRadius: 8,
+    padding: 12,
+    alignItems: "center",
+  },
+  countdownLabel: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "bold",
+    marginBottom: 5,
+  },
+  countdownTimer: {
+    color: "#e10600",
+    fontSize: 24,
+    fontWeight: "bold",
+  },
   circuitImage: {
     width: "100%",
     height: 200,

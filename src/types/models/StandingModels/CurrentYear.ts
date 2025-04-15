@@ -19,7 +19,7 @@ interface FastLap {
   fast_lap_team_id: string;
 }
 
-interface Circuit {
+export interface Circuit {
   circuitId: string;
   circuitName: string;
   country: string;

@@ -1,12 +1,13 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Race } from "../../../types/models/StandingModels/CurrentYear";
-import { set } from "date-fns";
+import { Circuit } from "../../../types/models/StandingModels/CurrentYear";
 
 interface RaceState {
   currentYearRaces: Race[];
   selectedRaceInfo: {
     year: string;
     round: string;
+    circuitInfo: Circuit;
   };
 }
 
@@ -15,6 +16,7 @@ const initialState: RaceState = {
   selectedRaceInfo: {
     year: "",
     round: "",
+    circuitInfo: {} as Circuit,
   },
 };
 
@@ -27,7 +29,11 @@ const raceSlice = createSlice({
     },
     setSelectedRaceInfo(
       state,
-      action: PayloadAction<{ year: string; round: string }>
+      action: PayloadAction<{
+        year: string;
+        round: string;
+        circuitInfo: Circuit;
+      }>
     ) {
       state.selectedRaceInfo = action.payload;
     },

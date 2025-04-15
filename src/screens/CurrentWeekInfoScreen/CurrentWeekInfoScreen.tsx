@@ -1,4 +1,4 @@
-import { View, Text, Image, ScrollView } from "react-native";
+import { View, Text, Image, ScrollView, StyleSheet } from "react-native";
 import React, { useEffect, useState } from "react";
 import { f1ApiClient } from "../../api/f1api/httpClient";
 import { Race } from "../../types/models/StandingModels/CurrentYear";
@@ -6,16 +6,21 @@ import { filterRacesThisWeek, getNextRace } from "../../utils/date";
 import { circuitData } from "../../data/data";
 import CountryFlag from "react-native-country-flag";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { format, parseISO } from "date-fns";
-import { styles } from "./styles";
+import { format, parseISO, differenceInSeconds } from "date-fns";
 import { useDispatch } from "react-redux";
 import { setCurrentYearRaces } from "../../hooks/redux_toolkit/Slices/RaceSlice";
 import { Response } from "../../types/models/StandingModels/Response";
+import { styles } from "./styles";
 
 const CurrentWeekInfo = () => {
   const [loading, setLoading] = useState(true);
   const [selectedRace, setSelectedRace] = useState<Race | null>(null);
   const [isThisWeek, setIsThisWeek] = useState<boolean>(false);
+  const [countdown, setCountdown] = useState<string>("");
+  const [nextEvent, setNextEvent] = useState<{
+    name: string;
+    date: Date;
+  } | null>(null);
   const dispatcher = useDispatch();
 
   const fetchCurrentYearData = async () => {
@@ -39,9 +44,88 @@ const CurrentWeekInfo = () => {
     }
   };
 
+  const updateCountdown = () => {
+    if (!selectedRace) return;
+
+    const now = new Date();
+    const events = [
+      {
+        name: "FP1",
+        date: parseISO(
+          `${selectedRace.schedule.fp1.date}T${selectedRace.schedule.fp1.time}`
+        ),
+      },
+      {
+        name: "FP2",
+        date: parseISO(
+          `${selectedRace.schedule.fp2.date}T${selectedRace.schedule.fp2.time}`
+        ),
+      },
+      {
+        name: "FP3",
+        date: parseISO(
+          `${selectedRace.schedule.fp3.date}T${selectedRace.schedule.fp3.time}`
+        ),
+      },
+      {
+        name: "Qualifying",
+        date: parseISO(
+          `${selectedRace.schedule.qualy.date}T${selectedRace.schedule.qualy.time}`
+        ),
+      },
+      {
+        name: "Race",
+        date: parseISO(
+          `${selectedRace.schedule.race.date}T${selectedRace.schedule.race.time}`
+        ),
+      },
+    ];
+
+    let nextEvent = null;
+    for (const event of events) {
+      if (event.date > now) {
+        nextEvent = event;
+        break;
+      }
+    }
+
+    if (!nextEvent) {
+      setCountdown("Event in progress");
+      setNextEvent(null);
+      return;
+    }
+
+    setNextEvent(nextEvent);
+
+    const diffInSeconds = differenceInSeconds(nextEvent.date, now);
+    if (diffInSeconds <= 0) {
+      setCountdown("Starting soon");
+      return;
+    }
+
+    const days = Math.floor(diffInSeconds / (3600 * 24));
+    const hours = Math.floor((diffInSeconds % (3600 * 24)) / 3600);
+    const minutes = Math.floor((diffInSeconds % 3600) / 60);
+    const seconds = diffInSeconds % 60;
+
+    setCountdown(
+      `${days > 0 ? `${days}d ` : ""}${
+        hours > 0 || days > 0 ? `${hours}h ` : ""
+      }${minutes}m ${seconds}s`
+    );
+  };
+
   useEffect(() => {
     fetchCurrentYearData();
   }, []);
+
+  useEffect(() => {
+    if (selectedRace) {
+      updateCountdown();
+      const timer = setInterval(updateCountdown, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [selectedRace]);
 
   const formatTime = (
     dateString: string | undefined,
@@ -70,7 +154,6 @@ const CurrentWeekInfo = () => {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Header Section */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>
           {isThisWeek ? "THIS WEEK'S RACE" : "NEXT RACE"}
@@ -85,9 +168,17 @@ const CurrentWeekInfo = () => {
             {selectedRace.circuit.city}, {selectedRace.circuit.country}
           </Text>
         </View>
+
+        {countdown && (
+          <View style={styles.countdownContainer}>
+            <Text style={styles.countdownLabel}>
+              {nextEvent ? `Next: ${nextEvent.name} in` : "Starting soon"}
+            </Text>
+            <Text style={styles.countdownTimer}>{countdown}</Text>
+          </View>
+        )}
       </View>
 
-      {/* Circuit Image */}
       <Image
         style={styles.circuitImage}
         source={{
@@ -97,9 +188,7 @@ const CurrentWeekInfo = () => {
         }}
       />
 
-      {/* Race Info Cards */}
       <View style={styles.infoCardsContainer}>
-        {/* Race Date Card */}
         <View style={styles.infoCard}>
           <MaterialCommunityIcons
             name="racing-helmet"
@@ -115,7 +204,6 @@ const CurrentWeekInfo = () => {
           </Text>
         </View>
 
-        {/* Qualifying Card */}
         <View style={styles.infoCard}>
           <MaterialCommunityIcons name="timer" size={24} color="#e10600" />
           <Text style={styles.infoCardTitle}>Qualifying</Text>
@@ -128,7 +216,6 @@ const CurrentWeekInfo = () => {
         </View>
       </View>
 
-      {/* Practice Sessions */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Practice Sessions</Text>
         <View style={styles.practiceContainer}>
@@ -162,7 +249,6 @@ const CurrentWeekInfo = () => {
         </View>
       </View>
 
-      {/* Circuit Info */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Circuit Info</Text>
         <View style={styles.circuitInfoContainer}>
@@ -191,7 +277,6 @@ const CurrentWeekInfo = () => {
         </View>
       </View>
 
-      {/* Last Winner */}
       {selectedRace.winner && (
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Last Winner</Text>
@@ -224,4 +309,5 @@ const CurrentWeekInfo = () => {
     </ScrollView>
   );
 };
+
 export default CurrentWeekInfo;

@@ -1,16 +1,19 @@
-import { View, FlatList } from "react-native";
+import { View, FlatList, Text, Image, ActivityIndicator } from "react-native";
 import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../hooks/redux_toolkit/store";
 import { f1ApiClient } from "../../api/f1api/httpClient";
 import { RaceDetails } from "../../types/models/StandingModels/RaceDetails";
 import RaceDetailsCard from "../../components/ui/cards/RaceDetailsCard";
+import { circuitData } from "../../data/data";
+import CountryFlag from "react-native-country-flag";
+import { styles } from "./styles";
 
 const RaceDetailsScreen = () => {
   const selectedRace = useSelector(
     (state: RootState) => state.race.selectedRaceInfo
   );
-
+  const [loading, setLoading] = React.useState(true);
   const [selectedRaceData, setSelectedRaceData] =
     React.useState<RaceDetails[]>();
 
@@ -19,15 +22,14 @@ const RaceDetailsScreen = () => {
       const selectedYearData = await f1ApiClient.get<{
         races: {
           results: RaceDetails[];
-          [key: string]: any;
         };
-        [key: string]: any;
       }>(`/${selectedRace.year}/${selectedRace.round}/race`);
 
-      console.log("results", selectedYearData.races.results);
       setSelectedRaceData(selectedYearData.races.results);
     } catch (error) {
       console.error("Error fetching teams:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -35,18 +37,56 @@ const RaceDetailsScreen = () => {
     fetchSelectedRaceData();
   }, []);
 
-  return (
-    <View>
-      <View></View>
-      <View style={{ marginBottom: "10%", marginTop: "5%" }}>
-        <FlatList
-          data={selectedRaceData}
-          renderItem={({ item }) => <RaceDetailsCard {...item} />}
-          ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
-          showsVerticalScrollIndicator={false}
+  const renderHeader = () => (
+    <View style={styles.headerContainer}>
+      <View style={styles.gradient}>
+        <Text style={styles.circuitName}>
+          {selectedRace.circuitInfo.circuitName}
+        </Text>
+      </View>
+
+      <Image
+        style={styles.circuitImage}
+        source={{
+          uri: circuitData[selectedRace.circuitInfo.circuitId].image,
+        }}
+      />
+
+      <View style={styles.locationContainer}>
+        <CountryFlag
+          isoCode={circuitData[selectedRace.circuitInfo.circuitId].flag}
+          size={24}
+          style={styles.flag}
         />
+        <Text style={styles.countryText}>
+          {selectedRace.circuitInfo.country}
+        </Text>
       </View>
     </View>
+  );
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator
+          size="large"
+          color="#e10600" // F1 red color
+        />
+        <Text style={styles.loadingText}>Loading race details...</Text>
+      </View>
+    );
+  }
+
+  return (
+    <FlatList
+      data={selectedRaceData}
+      renderItem={({ item }) => <RaceDetailsCard {...item} />}
+      keyExtractor={(_, index) => index.toString()}
+      ListHeaderComponent={renderHeader}
+      ItemSeparatorComponent={() => <View style={styles.separator} />}
+      contentContainerStyle={styles.listContent}
+      showsVerticalScrollIndicator={false}
+    />
   );
 };
 

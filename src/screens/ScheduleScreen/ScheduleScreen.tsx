@@ -6,6 +6,7 @@ import ScheduleScreenCard from "../../components/ui/cards/ScheduleScreenCard";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../types/navigation/Navigation";
 import { setSelectedRaceInfo } from "../../hooks/redux_toolkit/Slices/RaceSlice";
+import { Circuit } from "../../types/models/StandingModels/CurrentYear";
 
 const ScheduleScreen = () => {
   const currentYearRaces = useSelector(
@@ -14,11 +15,16 @@ const ScheduleScreen = () => {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const dispatcher = useDispatch();
 
-  const handleRaceDetails = (year: string, round: string) => {
+  const handleRaceDetails = (
+    year: string,
+    round: string,
+    circuitInfo: Circuit
+  ) => {
     dispatcher(
       setSelectedRaceInfo({
         year: year,
         round: round,
+        circuitInfo: circuitInfo,
       })
     );
     navigation.navigate("RaceDetailsScreen");
@@ -30,7 +36,9 @@ const ScheduleScreen = () => {
       renderItem={({ item }) => (
         <ScheduleScreenCard
           {...item}
-          onPress={() => handleRaceDetails("2025", item.round.toString())}
+          onPress={() =>
+            handleRaceDetails("2025", item.round.toString(), item.circuit)
+          }
         />
       )}
       ItemSeparatorComponent={() => <Text style={{ height: 10 }} />}

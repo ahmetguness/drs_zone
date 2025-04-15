@@ -2,6 +2,7 @@ import { Image, StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { RaceDetails } from "../../../types/models/StandingModels/RaceDetails";
 import { getDriverImageUrl } from "../../../utils/getDriverImageUrl";
+import { LinearGradient } from "expo-linear-gradient";
 
 const RaceDetailsCard: React.FC<RaceDetails> = ({
   position,
@@ -16,90 +17,111 @@ const RaceDetailsCard: React.FC<RaceDetails> = ({
     setImageUrl(url);
   }, [driver.surname]);
 
+  const getPositionColor = () => {
+    if (position === 1) return "#FFD700";
+    if (position === 2) return "#C0C0C0";
+    if (position === 3) return "#CD7F32";
+    return "#e10600";
+  };
+
   return (
     <View style={styles.root}>
-      <View style={styles.positionContainer}>
-        <Text style={styles.positionText}>{position}</Text>
-      </View>
+      <LinearGradient
+        colors={["#f8f8f8", "#ffffff"]}
+        style={styles.gradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      >
+        <View
+          style={[
+            styles.positionContainer,
+            { backgroundColor: getPositionColor() },
+          ]}
+        >
+          <Text style={styles.positionText}>{position}</Text>
+        </View>
 
-      <View style={styles.imageContainer}>
-        {imageUrl ? (
-          <Image
-            style={styles.driverImage}
-            source={{ uri: imageUrl }}
-            resizeMode="contain"
-          />
-        ) : (
-          <View style={styles.imagePlaceholder} />
-        )}
-      </View>
+        <View style={styles.imageContainer}>
+          {imageUrl ? (
+            <Image
+              style={styles.driverImage}
+              source={{ uri: imageUrl }}
+              resizeMode="contain"
+            />
+          ) : (
+            <View style={styles.imagePlaceholder} />
+          )}
+        </View>
 
-      <View style={styles.driverInfo}>
-        <Text style={styles.driverName}>
-          {driver.name} {driver.surname}
-        </Text>
-        <Text style={styles.driverTeam}>
-          {team.teamName || "Team not specified"}
-        </Text>
-      </View>
+        <View style={styles.driverInfo}>
+          <Text style={styles.driverName}>
+            {driver.name} {driver.surname}
+          </Text>
+          <Text style={styles.driverTeam}>
+            {team.teamName || "Team not specified"}
+          </Text>
+        </View>
 
-      <View style={styles.timeContainer}>
-        <Text style={styles.timeText}>{time || "No time"}</Text>
-      </View>
+        <View style={styles.timeContainer}>
+          <Text style={styles.timeText}>{time || "No time"}</Text>
+        </View>
+      </LinearGradient>
     </View>
   );
 };
 
-export default RaceDetailsCard;
-
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
-    padding: 16,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    borderRadius: 12,
-    marginVertical: 8,
     marginHorizontal: 16,
+    marginVertical: 6,
+    borderRadius: 12,
+    overflow: "hidden",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
+    elevation: 4,
+  },
+  gradient: {
+    padding: 16,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    minHeight: 100,
   },
   positionContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#F5F5F5",
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     justifyContent: "center",
     alignItems: "center",
   },
   positionText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
-    color: "#333333",
+    color: "white",
   },
   imageContainer: {
-    width: 80,
-    height: 80,
+    width: 60,
+    height: 60,
     justifyContent: "center",
     alignItems: "center",
+    marginLeft: 10,
   },
   driverImage: {
     width: "100%",
     height: "100%",
+    borderRadius: 30,
   },
   imagePlaceholder: {
     width: "100%",
     height: "100%",
     backgroundColor: "#EEEEEE",
-    borderRadius: 40,
+    borderRadius: 30,
   },
   driverInfo: {
     flex: 1,
@@ -107,24 +129,28 @@ const styles = StyleSheet.create({
   },
   driverName: {
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "700",
     color: "#222222",
     marginBottom: 4,
   },
   driverTeam: {
-    fontSize: 14,
+    fontSize: 13,
     color: "#666666",
     fontStyle: "italic",
   },
   timeContainer: {
-    backgroundColor: "#F8F8F8",
+    backgroundColor: "rgba(225, 6, 0, 0.1)",
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "rgba(225, 6, 0, 0.2)",
   },
   timeText: {
     fontSize: 14,
-    fontWeight: "500",
-    color: "#444444",
+    fontWeight: "600",
+    color: "#e10600",
   },
 });
+
+export default RaceDetailsCard;

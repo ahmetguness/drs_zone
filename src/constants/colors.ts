@@ -5,6 +5,11 @@ export const colors = {
   highlight: "#e10600",
   accent: "#2a9d8f",
   card: "#ffffff",
+  dark: '#121212',
+  darkGray: '#1E1E1E',
+  lightGray: '#BDBDBD',
+  white: '#FFFFFF',
+  red: '#E10600',
 };
 
 export const TEAM_COLORS: { [key: string]: string[] } = {
