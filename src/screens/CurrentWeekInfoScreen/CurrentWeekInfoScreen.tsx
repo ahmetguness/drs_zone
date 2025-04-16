@@ -68,6 +68,18 @@ const CurrentWeekInfo = () => {
         ),
       },
       {
+        name: "Sprint Qualifying",
+        date: parseISO(
+          `${selectedRace.schedule.sprintQualy.date}T${selectedRace.schedule.sprintQualy.time}`
+        ),
+      },
+      {
+        name: "Sprint Race",
+        date: parseISO(
+          `${selectedRace.schedule.sprintRace.date}T${selectedRace.schedule.sprintRace.time}`
+        ),
+      },
+      {
         name: "Qualifying",
         date: parseISO(
           `${selectedRace.schedule.qualy.date}T${selectedRace.schedule.qualy.time}`
@@ -79,7 +91,7 @@ const CurrentWeekInfo = () => {
           `${selectedRace.schedule.race.date}T${selectedRace.schedule.race.time}`
         ),
       },
-    ];
+    ].filter((event) => event.date.toString() !== "Invalid Date");
 
     let nextEvent = null;
     for (const event of events) {
@@ -128,12 +140,19 @@ const CurrentWeekInfo = () => {
   }, [selectedRace]);
 
   const formatTime = (
-    dateString: string | undefined,
-    timeString: string | undefined
+    dateString: string | null,
+    timeString: string | null
   ): string => {
     if (!dateString || !timeString) return "N/A";
     const dateTime: string = `${dateString}T${timeString}`;
     return format(parseISO(dateTime), "PPpp");
+  };
+
+  const hasSprintEvents = () => {
+    return (
+      selectedRace?.schedule.sprintQualy.date &&
+      selectedRace?.schedule.sprintRace.date
+    );
   };
 
   if (loading) {
@@ -198,8 +217,8 @@ const CurrentWeekInfo = () => {
           <Text style={styles.infoCardTitle}>Race</Text>
           <Text style={styles.infoCardValue}>
             {formatTime(
-              selectedRace.schedule.race.date ?? undefined,
-              selectedRace.schedule.race.time ?? undefined
+              selectedRace.schedule.race.date,
+              selectedRace.schedule.race.time
             )}
           </Text>
         </View>
@@ -209,11 +228,45 @@ const CurrentWeekInfo = () => {
           <Text style={styles.infoCardTitle}>Qualifying</Text>
           <Text style={styles.infoCardValue}>
             {formatTime(
-              selectedRace.schedule.qualy.date ?? undefined,
-              selectedRace.schedule.qualy.time ?? undefined
+              selectedRace.schedule.qualy.date,
+              selectedRace.schedule.qualy.time
             )}
           </Text>
         </View>
+
+        {hasSprintEvents() && (
+          <>
+            <View style={styles.infoCard}>
+              <MaterialCommunityIcons
+                name="timer-sand"
+                size={24}
+                color="#e10600"
+              />
+              <Text style={styles.infoCardTitle}>Sprint Qualy</Text>
+              <Text style={styles.infoCardValue}>
+                {formatTime(
+                  selectedRace.schedule.sprintQualy.date,
+                  selectedRace.schedule.sprintQualy.time
+                )}
+              </Text>
+            </View>
+
+            <View style={styles.infoCard}>
+              <MaterialCommunityIcons
+                name="flag-checkered"
+                size={24}
+                color="#e10600"
+              />
+              <Text style={styles.infoCardTitle}>Sprint Race</Text>
+              <Text style={styles.infoCardValue}>
+                {formatTime(
+                  selectedRace.schedule.sprintRace.date,
+                  selectedRace.schedule.sprintRace.time
+                )}
+              </Text>
+            </View>
+          </>
+        )}
       </View>
 
       <View style={styles.section}>
@@ -223,29 +276,33 @@ const CurrentWeekInfo = () => {
             <Text style={styles.practiceTitle}>FP1</Text>
             <Text style={styles.practiceTime}>
               {formatTime(
-                selectedRace.schedule.fp1.date ?? undefined,
-                selectedRace.schedule.fp1.time ?? undefined
+                selectedRace.schedule.fp1.date,
+                selectedRace.schedule.fp1.time
               )}
             </Text>
           </View>
-          <View style={styles.practiceSession}>
-            <Text style={styles.practiceTitle}>FP2</Text>
-            <Text style={styles.practiceTime}>
-              {formatTime(
-                selectedRace.schedule.fp2.date ?? undefined,
-                selectedRace.schedule.fp2.time ?? undefined
-              )}
-            </Text>
-          </View>
-          <View style={styles.practiceSession}>
-            <Text style={styles.practiceTitle}>FP3</Text>
-            <Text style={styles.practiceTime}>
-              {formatTime(
-                selectedRace.schedule.fp3.date ?? undefined,
-                selectedRace.schedule.fp3.time ?? undefined
-              )}
-            </Text>
-          </View>
+          {selectedRace.schedule.fp2.date && (
+            <View style={styles.practiceSession}>
+              <Text style={styles.practiceTitle}>FP2</Text>
+              <Text style={styles.practiceTime}>
+                {formatTime(
+                  selectedRace.schedule.fp2.date,
+                  selectedRace.schedule.fp2.time
+                )}
+              </Text>
+            </View>
+          )}
+          {selectedRace.schedule.fp3.date && (
+            <View style={styles.practiceSession}>
+              <Text style={styles.practiceTitle}>FP3</Text>
+              <Text style={styles.practiceTime}>
+                {formatTime(
+                  selectedRace.schedule.fp3.date,
+                  selectedRace.schedule.fp3.time
+                )}
+              </Text>
+            </View>
+          )}
         </View>
       </View>
 

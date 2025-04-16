@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { TouchableOpacity, Alert } from "react-native";
 import DriverStandingsScreen from "../screens/DriverStandingsScreen/DriverStandingsScreen";
 import TeamStandingsScreen from "../screens/TeamStandingsScreen/TeamStandingsScreen";
 import CurrentWeekInfo from "../screens/CurrentWeekInfoScreen/CurrentWeekInfoScreen";
@@ -10,6 +11,33 @@ import ScheduleScreen from "../screens/ScheduleScreen/ScheduleScreen";
 const Tab = createBottomTabNavigator();
 
 const AppBottomTabBarNavigation = () => {
+  const [isNotificationOn, setIsNotificationOn] = useState(false);
+
+  const handleNotificationToggle = () => {
+    if (!isNotificationOn) {
+      Alert.alert(
+        "Enable Notifications",
+        "Are you sure you want to enable notifications?",
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+          {
+            text: "Yes",
+            onPress: () => {
+              setIsNotificationOn(true);
+              console.log("Notification toggled: ON");
+            },
+          },
+        ]
+      );
+    } else {
+      setIsNotificationOn(false);
+      console.log("Notification toggled: OFF");
+    }
+  };
+
   return (
     <Tab.Navigator>
       <Tab.Screen
@@ -26,8 +54,20 @@ const AppBottomTabBarNavigation = () => {
             />
           ),
           title: "The Race Ahead",
+          headerRight: () => (
+            <TouchableOpacity
+              onPress={handleNotificationToggle}
+              style={{ marginRight: 15 }}
+            >
+              <Ionicons
+                name={isNotificationOn ? "notifications" : "notifications-off"}
+                size={24}
+              />
+            </TouchableOpacity>
+          ),
         }}
       />
+
       <Tab.Screen
         name="ScheduleScreen"
         component={ScheduleScreen}

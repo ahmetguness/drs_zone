@@ -69,12 +69,14 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     padding: 15,
+    flexWrap: "wrap",
   },
   infoCard: {
     backgroundColor: "#fff",
     borderRadius: 10,
     padding: 15,
     width: "48%",
+    marginBottom: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -108,12 +110,14 @@ export const styles = StyleSheet.create({
   practiceContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
+    flexWrap: "wrap",
   },
   practiceSession: {
     backgroundColor: "#f5f5f5",
     borderRadius: 8,
     padding: 12,
     width: "30%",
+    marginBottom: 10,
     alignItems: "center",
   },
   practiceTitle: {
