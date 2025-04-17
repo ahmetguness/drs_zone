@@ -4,6 +4,7 @@ import { TeamStanding } from "../../types/models/StandingModels/TeamStanding";
 import { f1ApiClient } from "../../api/f1api/httpClient";
 import TeamStandingCard from "../../components/ui/cards/TeamStandingCard";
 import { styles } from "./styles";
+import LoadingComponent from "../../components/common/LoadingComponent";
 
 const TeamStandingsScreen = () => {
   const [teamStanding, setTeamStanding] = useState<TeamStanding[]>([]);
@@ -29,9 +30,7 @@ const TeamStandingsScreen = () => {
   return (
     <View style={styles.root}>
       {loading ? (
-        <View style={styles.activityIndicator}>
-          <ActivityIndicator animating={loading} />
-        </View>
+        <LoadingComponent title="Loading Constructor Data..." />
       ) : (
         <FlatList
           data={teamStanding}

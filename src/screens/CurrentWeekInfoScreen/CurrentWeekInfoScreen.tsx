@@ -11,6 +11,7 @@ import { useDispatch } from "react-redux";
 import { setCurrentYearRaces } from "../../hooks/redux_toolkit/Slices/RaceSlice";
 import { Response } from "../../types/models/StandingModels/Response";
 import { styles } from "./styles";
+import LoadingComponent from "../../components/common/LoadingComponent";
 
 const CurrentWeekInfo = () => {
   const [loading, setLoading] = useState(true);
@@ -156,11 +157,7 @@ const CurrentWeekInfo = () => {
   };
 
   if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <Text style={styles.loadingText}>Loading race data...</Text>
-      </View>
-    );
+    return <LoadingComponent title="Loading Race Data..." />;
   }
 
   if (!selectedRace) {

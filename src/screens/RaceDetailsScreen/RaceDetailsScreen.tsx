@@ -8,6 +8,7 @@ import RaceDetailsCard from "../../components/ui/cards/RaceDetailsCard";
 import { circuitData } from "../../data/data";
 import CountryFlag from "react-native-country-flag";
 import { styles } from "./styles";
+import LoadingComponent from "../../components/common/LoadingComponent";
 
 const RaceDetailsScreen = () => {
   const selectedRace = useSelector(
@@ -66,15 +67,7 @@ const RaceDetailsScreen = () => {
   );
 
   if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator
-          size="large"
-          color="#e10600" // F1 red color
-        />
-        <Text style={styles.loadingText}>Loading race details...</Text>
-      </View>
-    );
+    return <LoadingComponent title={`Loading Race Data...`} />;
   }
 
   return (

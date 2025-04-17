@@ -4,6 +4,7 @@ import { styles } from "./styles";
 import { f1ApiClient } from "../../api/f1api/httpClient";
 import DriverStandingCard from "../../components/ui/cards/DriverStandingCard";
 import { DriverStanding } from "../../types/models/StandingModels/DriverStanding";
+import LoadingComponent from "../../components/common/LoadingComponent";
 
 const DriverStandingsScreen = () => {
   const [driverStandings, setDriverStandings] = useState<DriverStanding[]>([]);
@@ -29,9 +30,7 @@ const DriverStandingsScreen = () => {
   return (
     <View style={styles.root}>
       {loading ? (
-        <View style={styles.activityIndicator}>
-          <ActivityIndicator animating={loading} />
-        </View>
+        <LoadingComponent title="Loading Driver Data..." />
       ) : (
         <FlatList
           data={driverStandings}
