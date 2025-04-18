@@ -182,4 +182,15 @@ export const styles = StyleSheet.create({
     marginTop: 5,
     fontWeight: "500",
   },
+  completedSession: {
+    backgroundColor: '#e8f5e9', // Light green background for completed sessions
+    borderColor: '#4caf50', // Green border
+    borderWidth: 1,
+  },
+  completedText: {
+    color: '#4caf50', // Green text
+    fontWeight: 'bold',
+    marginTop: 5,
+    fontSize: 12,
+  },
 });

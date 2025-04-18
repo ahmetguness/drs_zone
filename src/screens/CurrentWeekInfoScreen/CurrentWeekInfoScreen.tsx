@@ -22,6 +22,9 @@ const CurrentWeekInfo = () => {
     name: string;
     date: Date;
   } | null>(null);
+  const [completedEvents, setCompletedEvents] = useState<Set<string>>(
+    new Set()
+  );
   const dispatcher = useDispatch();
 
   const fetchCurrentYearData = async () => {
@@ -55,56 +58,85 @@ const CurrentWeekInfo = () => {
         date: parseISO(
           `${selectedRace.schedule.fp1.date}T${selectedRace.schedule.fp1.time}`
         ),
+        duration: 60 * 60 * 1000,
       },
       {
         name: "FP2",
         date: parseISO(
           `${selectedRace.schedule.fp2.date}T${selectedRace.schedule.fp2.time}`
         ),
+        duration: 60 * 60 * 1000,
       },
       {
         name: "FP3",
         date: parseISO(
           `${selectedRace.schedule.fp3.date}T${selectedRace.schedule.fp3.time}`
         ),
+        duration: 60 * 60 * 1000,
       },
       {
         name: "Sprint Qualifying",
         date: parseISO(
           `${selectedRace.schedule.sprintQualy.date}T${selectedRace.schedule.sprintQualy.time}`
         ),
+        duration: 60 * 60 * 1000,
       },
       {
         name: "Sprint Race",
         date: parseISO(
           `${selectedRace.schedule.sprintRace.date}T${selectedRace.schedule.sprintRace.time}`
         ),
+        duration: 45 * 60 * 1000,
       },
       {
         name: "Qualifying",
         date: parseISO(
           `${selectedRace.schedule.qualy.date}T${selectedRace.schedule.qualy.time}`
         ),
+        duration: 60 * 60 * 1000,
       },
       {
         name: "Race",
         date: parseISO(
           `${selectedRace.schedule.race.date}T${selectedRace.schedule.race.time}`
         ),
+        duration: 90 * 60 * 1000,
       },
     ].filter((event) => event.date.toString() !== "Invalid Date");
 
+    const newCompletedEvents = new Set<string>();
+    for (const event of events) {
+      const endTime = new Date(event.date.getTime() + event.duration);
+      if (endTime < now) {
+        newCompletedEvents.add(event.name);
+      }
+    }
+    setCompletedEvents(newCompletedEvents);
+
     let nextEvent = null;
     for (const event of events) {
-      if (event.date > now) {
+      const endTime = new Date(event.date.getTime() + event.duration);
+      if (endTime > now) {
         nextEvent = event;
         break;
       }
     }
 
     if (!nextEvent) {
-      setCountdown("Event in progress");
+      setCountdown("All sessions completed");
       setNextEvent(null);
+      return;
+    }
+
+    const eventEndTime = new Date(
+      nextEvent.date.getTime() + nextEvent.duration
+    );
+    if (nextEvent.date < now && now < eventEndTime) {
+      setCountdown("Session in progress");
+      setNextEvent({
+        name: nextEvent.name,
+        date: eventEndTime,
+      });
       return;
     }
 
@@ -154,6 +186,10 @@ const CurrentWeekInfo = () => {
       selectedRace?.schedule.sprintQualy.date &&
       selectedRace?.schedule.sprintRace.date
     );
+  };
+
+  const isSessionCompleted = (sessionName: string) => {
+    return completedEvents.has(sessionName);
   };
 
   if (loading) {
@@ -218,6 +254,9 @@ const CurrentWeekInfo = () => {
               selectedRace.schedule.race.time
             )}
           </Text>
+          {isSessionCompleted("Race") && (
+            <Text style={styles.completedText}>Completed</Text>
+          )}
         </View>
 
         <View style={styles.infoCard}>
@@ -229,6 +268,9 @@ const CurrentWeekInfo = () => {
               selectedRace.schedule.qualy.time
             )}
           </Text>
+          {isSessionCompleted("Qualifying") && (
+            <Text style={styles.completedText}>Completed</Text>
+          )}
         </View>
 
         {hasSprintEvents() && (
@@ -246,6 +288,9 @@ const CurrentWeekInfo = () => {
                   selectedRace.schedule.sprintQualy.time
                 )}
               </Text>
+              {isSessionCompleted("Sprint Qualifying") && (
+                <Text style={styles.completedText}>Completed</Text>
+              )}
             </View>
 
             <View style={styles.infoCard}>
@@ -261,6 +306,9 @@ const CurrentWeekInfo = () => {
                   selectedRace.schedule.sprintRace.time
                 )}
               </Text>
+              {isSessionCompleted("Sprint Race") && (
+                <Text style={styles.completedText}>Completed</Text>
+              )}
             </View>
           </>
         )}
@@ -269,7 +317,12 @@ const CurrentWeekInfo = () => {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Practice Sessions</Text>
         <View style={styles.practiceContainer}>
-          <View style={styles.practiceSession}>
+          <View
+            style={[
+              styles.practiceSession,
+              isSessionCompleted("FP1") && styles.completedSession,
+            ]}
+          >
             <Text style={styles.practiceTitle}>FP1</Text>
             <Text style={styles.practiceTime}>
               {formatTime(
@@ -277,9 +330,17 @@ const CurrentWeekInfo = () => {
                 selectedRace.schedule.fp1.time
               )}
             </Text>
+            {isSessionCompleted("FP1") && (
+              <Text style={styles.completedText}>Completed</Text>
+            )}
           </View>
           {selectedRace.schedule.fp2.date && (
-            <View style={styles.practiceSession}>
+            <View
+              style={[
+                styles.practiceSession,
+                isSessionCompleted("FP2") && styles.completedSession,
+              ]}
+            >
               <Text style={styles.practiceTitle}>FP2</Text>
               <Text style={styles.practiceTime}>
                 {formatTime(
@@ -287,10 +348,18 @@ const CurrentWeekInfo = () => {
                   selectedRace.schedule.fp2.time
                 )}
               </Text>
+              {isSessionCompleted("FP2") && (
+                <Text style={styles.completedText}>Completed</Text>
+              )}
             </View>
           )}
           {selectedRace.schedule.fp3.date && (
-            <View style={styles.practiceSession}>
+            <View
+              style={[
+                styles.practiceSession,
+                isSessionCompleted("FP3") && styles.completedSession,
+              ]}
+            >
               <Text style={styles.practiceTitle}>FP3</Text>
               <Text style={styles.practiceTime}>
                 {formatTime(
@@ -298,6 +367,9 @@ const CurrentWeekInfo = () => {
                   selectedRace.schedule.fp3.time
                 )}
               </Text>
+              {isSessionCompleted("FP3") && (
+                <Text style={styles.completedText}>Completed</Text>
+              )}
             </View>
           )}
         </View>
