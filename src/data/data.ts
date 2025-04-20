@@ -1,3 +1,5 @@
+import { Session } from "../types/models/StandingModels/Sessions";
+
 export const teamStandingData: { [key: string]: string } = {
   mclaren:
     "https://media.formula1.com/image/upload/f_auto,c_limit,q_75,w_1320/content/dam/fom-website/2018-redesign-assets/team%20logos/mclaren",
@@ -18,55 +20,6 @@ export const teamStandingData: { [key: string]: string } = {
   alpine:
     "https://media.formula1.com/image/upload/f_auto,c_limit,q_75,w_1320/content/dam/fom-website/2018-redesign-assets/team%20logos/alpine",
 };
-
-// export const circuitData: { [key: string]: string } = {
-//   albert_park:
-//     "https://media.formula1.com/image/upload/f_auto,c_limit,q_auto,w_771/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Australia_Circuit",
-//   shangai:
-//     "https://media.formula1.com/image/upload/f_auto,c_limit,q_auto,w_1320/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/China_Circuit",
-//   suzuka:
-//     "https://media.formula1.com/image/upload/f_auto,c_limit,q_auto,w_1320/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Japan_Circuit",
-//   bahrain:
-//     "https://media.formula1.com/image/upload/f_auto,c_limit,q_auto,w_1320/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Bahrain_Circuit",
-//   jeddah:
-//     "https://media.formula1.com/image/upload/f_auto,c_limit,q_auto,w_1320/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Saudi_Arabia_Circuit",
-//   miami:
-//     "https://media.formula1.com/image/upload/f_auto,c_limit,q_auto,w_1320/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Miami_Circuit",
-//   imola:
-//     "https://media.formula1.com/image/upload/f_auto,c_limit,q_auto,w_1320/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Emilia_Romagna_Circuit",
-//   monaco:
-//     "https://media.formula1.com/image/upload/f_auto,c_limit,q_auto,w_1320/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Monaco_Circuit",
-//   montmelo:
-//     "https://media.formula1.com/image/upload/f_auto,c_limit,q_auto,w_1320/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Spain_Circuit",
-//   gilles_villeneuve:
-//     "https://media.formula1.com/image/upload/f_auto,c_limit,q_auto,w_1320/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Canada_Circuit",
-//   red_bull_ring:
-//     "https://media.formula1.com/image/upload/f_auto,c_limit,q_auto,w_1320/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Austria_Circuit",
-//   silverstone:
-//     "https://media.formula1.com/image/upload/f_auto,c_limit,q_auto,w_1320/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Great_Britain_Circuit",
-//   spa: "https://media.formula1.com/image/upload/f_auto,c_limit,q_auto,w_1320/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Belgium_Circuit",
-//   hungaroring:
-//     "https://media.formula1.com/image/upload/f_auto,c_limit,q_auto,w_1320/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Hungary_Circuit",
-//   zandvoort:
-//     "https://media.formula1.com/image/upload/f_auto,c_limit,q_auto,w_1320/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Netherlands_Circuit",
-//   monza:
-//     "https://media.formula1.com/image/upload/f_auto,c_limit,q_auto,w_1320/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Italy_Circuit",
-//   baku: "https://media.formula1.com/image/upload/f_auto,c_limit,q_auto,w_1320/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Baku_Circuit",
-//   marina_bay:
-//     "https://media.formula1.com/image/upload/f_auto,c_limit,q_auto,w_1320/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Singapore_Circuit",
-//   austin:
-//     "https://media.formula1.com/image/upload/f_auto,c_limit,q_auto,w_1320/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/USA_Circuit",
-//   hermanos_rodriguez:
-//     "https://media.formula1.com/image/upload/f_auto,c_limit,q_auto,w_1320/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Mexico_Circuit",
-//   interlagos:
-//     "https://media.formula1.com/image/upload/f_auto,c_limit,q_auto,w_1320/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Brazil_Circuit",
-//   vegas:
-//     "https://media.formula1.com/image/upload/f_auto,c_limit,q_auto,w_1320/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Las_Vegas_Circuit",
-//   lusail:
-//     "https://media.formula1.com/image/upload/f_auto,c_limit,q_auto,w_1320/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Qatar_Circuit",
-//   yas_marina:
-//     "https://media.formula1.com/image/upload/f_auto,c_limit,q_auto,w_1320/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Abu_Dhabi_Circuit",
-// };
 
 export const circuitData: { [key: string]: { image: string; flag: string } } = {
   albert_park: {
@@ -190,3 +143,37 @@ export const circuitData: { [key: string]: { image: string; flag: string } } = {
     flag: "ae",
   },
 };
+
+export const getMainSessions = (hasSprint: boolean): Session[] => {
+  if (hasSprint) {
+    return [
+      { id: "fp", name: "Free Practice" },
+      { id: "sprint", name: "Sprint" },
+      { id: "qualifying", name: "Qualifying" },
+      { id: "race", name: "Race" },
+    ];
+  } else {
+    return [
+      { id: "fp", name: "Free Practices" },
+      { id: "qualifying", name: "Qualifying" },
+      { id: "race", name: "Race" },
+    ];
+  }
+};
+
+export const getPracticeSessions = (hasSprint: boolean): Session[] => {
+  if (hasSprint) {
+    return [{ id: "fp1", name: "FP1" }];
+  } else {
+    return [
+      { id: "fp1", name: "FP1" },
+      { id: "fp2", name: "FP2" },
+      { id: "fp3", name: "FP3" },
+    ];
+  }
+};
+
+export const SPRINT_SESSIONS: Session[] = [
+  { id: "sprintQuali", name: "Sprint Qualifying" },
+  { id: "sprintRace", name: "Sprint Race" },
+];

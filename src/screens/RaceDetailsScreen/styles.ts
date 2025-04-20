@@ -57,4 +57,9 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
   },
+  sessionContainer: {
+    width: "100%",
+    marginTop: "3%",
+    alignItems: "center",
+  },
 });

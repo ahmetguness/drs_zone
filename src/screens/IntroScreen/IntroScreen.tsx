@@ -33,7 +33,7 @@ const IntroScreen = () => {
         onPress={handlePress}
         activeOpacity={0.7}
       >
-        <Text style={styles.text}>Lets Race</Text>
+        <Text style={styles.text}>Let's Race</Text>
       </TouchableOpacity>
     </ImageBackground>
   );

@@ -8,6 +8,7 @@ interface RaceState {
     year: string;
     round: string;
     circuitInfo: Circuit;
+    haveSprint: boolean;
   };
 }
 
@@ -17,6 +18,7 @@ const initialState: RaceState = {
     year: "",
     round: "",
     circuitInfo: {} as Circuit,
+    haveSprint: false,
   },
 };
 
@@ -33,6 +35,7 @@ const raceSlice = createSlice({
         year: string;
         round: string;
         circuitInfo: Circuit;
+        haveSprint: boolean;
       }>
     ) {
       state.selectedRaceInfo = action.payload;

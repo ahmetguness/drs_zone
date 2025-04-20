@@ -25,10 +25,17 @@ const ScheduleScreen = () => {
         year: year,
         round: round,
         circuitInfo: circuitInfo,
+        haveSprint:
+          currentYearRaces[parseInt(round)-1]?.schedule?.sprintQualy?.date ===
+          null
+            ? false
+            : true,
       })
     );
     navigation.navigate("RaceDetailsScreen");
   };
+
+  console.log("aaa", currentYearRaces[0].schedule.sprintQualy.date);
 
   return (
     <FlatList

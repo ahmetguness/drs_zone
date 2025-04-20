@@ -13,25 +13,29 @@ import { Response } from "../../types/models/StandingModels/Response";
 import { styles } from "./styles";
 import LoadingComponent from "../../components/common/LoadingComponent";
 
+type RaceEvent = {
+  name: string;
+  date: Date;
+  duration: number;
+  completed?: boolean;
+  inProgress?: boolean;
+};
+
 const CurrentWeekInfo = () => {
   const [loading, setLoading] = useState(true);
   const [selectedRace, setSelectedRace] = useState<Race | null>(null);
-  const [isThisWeek, setIsThisWeek] = useState<boolean>(false);
-  const [countdown, setCountdown] = useState<string>("");
-  const [nextEvent, setNextEvent] = useState<{
-    name: string;
-    date: Date;
-  } | null>(null);
-  const [completedEvents, setCompletedEvents] = useState<Set<string>>(
-    new Set()
-  );
-  const dispatcher = useDispatch();
+  const [isThisWeek, setIsThisWeek] = useState(false);
+  const [countdown, setCountdown] = useState("");
+  const [nextEvent, setNextEvent] = useState<RaceEvent | null>(null);
+  const [raceEvents, setRaceEvents] = useState<RaceEvent[]>([]);
+  const dispatch = useDispatch();
 
   const fetchCurrentYearData = async () => {
     try {
       const response = await f1ApiClient.get<Response>("/2025");
       const races = response.races;
-      dispatcher(setCurrentYearRaces(races));
+      dispatch(setCurrentYearRaces(races));
+
       const thisWeekRace = filterRacesThisWeek(races);
       if (thisWeekRace.length > 0) {
         setSelectedRace(thisWeekRace[0]);
@@ -48,115 +52,118 @@ const CurrentWeekInfo = () => {
     }
   };
 
-  const updateCountdown = () => {
-    if (!selectedRace) return;
+  const prepareRaceEvents = (race: Race): RaceEvent[] => {
+    if (!race) return [];
 
-    const now = new Date();
-    const events = [
+    return [
       {
         name: "FP1",
-        date: parseISO(
-          `${selectedRace.schedule.fp1.date}T${selectedRace.schedule.fp1.time}`
-        ),
+        date: parseISO(`${race.schedule.fp1.date}T${race.schedule.fp1.time}`),
         duration: 60 * 60 * 1000,
       },
       {
         name: "FP2",
-        date: parseISO(
-          `${selectedRace.schedule.fp2.date}T${selectedRace.schedule.fp2.time}`
-        ),
+        date: parseISO(`${race.schedule.fp2.date}T${race.schedule.fp2.time}`),
         duration: 60 * 60 * 1000,
       },
       {
         name: "FP3",
-        date: parseISO(
-          `${selectedRace.schedule.fp3.date}T${selectedRace.schedule.fp3.time}`
-        ),
+        date: parseISO(`${race.schedule.fp3.date}T${race.schedule.fp3.time}`),
         duration: 60 * 60 * 1000,
       },
       {
         name: "Sprint Qualifying",
         date: parseISO(
-          `${selectedRace.schedule.sprintQualy.date}T${selectedRace.schedule.sprintQualy.time}`
+          `${race.schedule.sprintQualy.date}T${race.schedule.sprintQualy.time}`
         ),
         duration: 60 * 60 * 1000,
       },
       {
         name: "Sprint Race",
         date: parseISO(
-          `${selectedRace.schedule.sprintRace.date}T${selectedRace.schedule.sprintRace.time}`
+          `${race.schedule.sprintRace.date}T${race.schedule.sprintRace.time}`
         ),
         duration: 45 * 60 * 1000,
       },
       {
         name: "Qualifying",
         date: parseISO(
-          `${selectedRace.schedule.qualy.date}T${selectedRace.schedule.qualy.time}`
+          `${race.schedule.qualy.date}T${race.schedule.qualy.time}`
         ),
         duration: 60 * 60 * 1000,
       },
       {
         name: "Race",
-        date: parseISO(
-          `${selectedRace.schedule.race.date}T${selectedRace.schedule.race.time}`
-        ),
+        date: parseISO(`${race.schedule.race.date}T${race.schedule.race.time}`),
         duration: 90 * 60 * 1000,
       },
     ].filter((event) => event.date.toString() !== "Invalid Date");
+  };
 
-    const newCompletedEvents = new Set<string>();
-    for (const event of events) {
-      const endTime = new Date(event.date.getTime() + event.duration);
-      if (endTime < now) {
-        newCompletedEvents.add(event.name);
-      }
-    }
-    setCompletedEvents(newCompletedEvents);
+  const updateRaceStatus = () => {
+    if (!selectedRace) return;
 
-    let nextEvent = null;
-    for (const event of events) {
-      const endTime = new Date(event.date.getTime() + event.duration);
-      if (endTime > now) {
-        nextEvent = event;
-        break;
-      }
-    }
+    const now = new Date();
+    const updatedEvents = prepareRaceEvents(selectedRace).map((event) => {
+      const startTime = event.date;
+      const endTime = new Date(startTime.getTime() + event.duration);
 
-    if (!nextEvent) {
+      return {
+        ...event,
+        completed: endTime < now,
+        inProgress: startTime <= now && now <= endTime,
+        progressPercentage:
+          startTime <= now && now <= endTime
+            ? Math.min(
+                100,
+                ((now.getTime() - startTime.getTime()) / event.duration) * 100
+              )
+            : 0,
+      };
+    });
+
+    setRaceEvents(updatedEvents);
+
+    const currentEvent = updatedEvents.find((event) => event.inProgress);
+    const upcomingEvent = updatedEvents.find(
+      (event) => event.date > now && !event.completed
+    );
+
+    if (currentEvent) {
+      const startedSeconds = differenceInSeconds(now, currentEvent.date);
+      const startedMinutes = Math.floor(startedSeconds / 60);
+
+      setCountdown(
+        `Live: ${currentEvent.name} - Started ${startedMinutes}m ago`
+      );
+      setNextEvent(currentEvent);
+    } else if (upcomingEvent) {
+      const diffSeconds = differenceInSeconds(upcomingEvent.date, now);
+      const days = Math.floor(diffSeconds / (3600 * 24));
+      const hours = Math.floor((diffSeconds % (3600 * 24)) / 3600);
+      const minutes = Math.floor((diffSeconds % 3600) / 60);
+
+      let countdownText = `Next: ${upcomingEvent.name} in `;
+      if (days > 0) countdownText += `${days}d `;
+      if (hours > 0 || days > 0) countdownText += `${Math.floor(hours)}h `;
+      countdownText += `${minutes}m`;
+
+      setCountdown(countdownText);
+      setNextEvent(upcomingEvent);
+    } else {
       setCountdown("All sessions completed");
       setNextEvent(null);
-      return;
     }
+  };
 
-    const eventEndTime = new Date(
-      nextEvent.date.getTime() + nextEvent.duration
-    );
-    if (nextEvent.date < now && now < eventEndTime) {
-      setCountdown("Session in progress");
-      setNextEvent({
-        name: nextEvent.name,
-        date: eventEndTime,
-      });
-      return;
-    }
+  const formatEventTime = (date: Date): string => {
+    return format(date, "PPpp");
+  };
 
-    setNextEvent(nextEvent);
-
-    const diffInSeconds = differenceInSeconds(nextEvent.date, now);
-    if (diffInSeconds <= 0) {
-      setCountdown("Starting soon");
-      return;
-    }
-
-    const days = Math.floor(diffInSeconds / (3600 * 24));
-    const hours = Math.floor((diffInSeconds % (3600 * 24)) / 3600);
-    const minutes = Math.floor((diffInSeconds % 3600) / 60);
-    const seconds = diffInSeconds % 60;
-
-    setCountdown(
-      `${days > 0 ? `${days}d ` : ""}${
-        hours > 0 || days > 0 ? `${hours}h ` : ""
-      }${minutes}m ${seconds}s`
+  const hasSprintEvents = () => {
+    return raceEvents.some(
+      (event) =>
+        event.name === "Sprint Qualifying" || event.name === "Sprint Race"
     );
   };
 
@@ -166,31 +173,11 @@ const CurrentWeekInfo = () => {
 
   useEffect(() => {
     if (selectedRace) {
-      updateCountdown();
-      const timer = setInterval(updateCountdown, 1000);
+      updateRaceStatus();
+      const timer = setInterval(updateRaceStatus, 1000);
       return () => clearInterval(timer);
     }
   }, [selectedRace]);
-
-  const formatTime = (
-    dateString: string | null,
-    timeString: string | null
-  ): string => {
-    if (!dateString || !timeString) return "N/A";
-    const dateTime: string = `${dateString}T${timeString}`;
-    return format(parseISO(dateTime), "PPpp");
-  };
-
-  const hasSprintEvents = () => {
-    return (
-      selectedRace?.schedule.sprintQualy.date &&
-      selectedRace?.schedule.sprintRace.date
-    );
-  };
-
-  const isSessionCompleted = (sessionName: string) => {
-    return completedEvents.has(sessionName);
-  };
 
   if (loading) {
     return <LoadingComponent title="Loading Race Data..." />;
@@ -211,6 +198,7 @@ const CurrentWeekInfo = () => {
           {isThisWeek ? "THIS WEEK'S RACE" : "NEXT RACE"}
         </Text>
         <Text style={styles.raceName}>{selectedRace.raceName}</Text>
+
         <View style={styles.locationContainer}>
           <CountryFlag
             isoCode={circuitData[selectedRace.circuit.circuitId]?.flag || "au"}
@@ -222,11 +210,33 @@ const CurrentWeekInfo = () => {
         </View>
 
         {countdown && (
-          <View style={styles.countdownContainer}>
-            <Text style={styles.countdownLabel}>
-              {nextEvent ? `Next: ${nextEvent.name} in` : "Starting soon"}
+          <View
+            style={
+              countdown.startsWith("Live:")
+                ? styles.liveContainer
+                : styles.countdownContainer
+            }
+          >
+            <Text
+              style={
+                countdown.startsWith("Live:")
+                  ? styles.liveText
+                  : styles.countdownLabel
+              }
+            >
+              {countdown.split(" - ")[0]}
             </Text>
-            <Text style={styles.countdownTimer}>{countdown}</Text>
+            {countdown.includes(" - ") && (
+              <Text
+                style={
+                  countdown.startsWith("Live:")
+                    ? styles.liveTimer
+                    : styles.countdownTimer
+                }
+              >
+                {countdown.split(" - ")[1]}
+              </Text>
+            )}
           </View>
         )}
       </View>
@@ -241,137 +251,106 @@ const CurrentWeekInfo = () => {
       />
 
       <View style={styles.infoCardsContainer}>
-        <View style={styles.infoCard}>
-          <MaterialCommunityIcons
-            name="racing-helmet"
-            size={24}
-            color="#e10600"
-          />
-          <Text style={styles.infoCardTitle}>Race</Text>
-          <Text style={styles.infoCardValue}>
-            {formatTime(
-              selectedRace.schedule.race.date,
-              selectedRace.schedule.race.time
-            )}
-          </Text>
-          {isSessionCompleted("Race") && (
-            <Text style={styles.completedText}>Completed</Text>
-          )}
-        </View>
-
-        <View style={styles.infoCard}>
-          <MaterialCommunityIcons name="timer" size={24} color="#e10600" />
-          <Text style={styles.infoCardTitle}>Qualifying</Text>
-          <Text style={styles.infoCardValue}>
-            {formatTime(
-              selectedRace.schedule.qualy.date,
-              selectedRace.schedule.qualy.time
-            )}
-          </Text>
-          {isSessionCompleted("Qualifying") && (
-            <Text style={styles.completedText}>Completed</Text>
-          )}
-        </View>
-
-        {hasSprintEvents() && (
-          <>
-            <View style={styles.infoCard}>
+        {raceEvents
+          .filter((event: RaceEvent) =>
+            ["Race", "Qualifying", "Sprint Qualifying", "Sprint Race"].includes(
+              event.name
+            )
+          )
+          .map((event: RaceEvent) => (
+            <View
+              key={event.name}
+              style={[
+                styles.infoCard,
+                event.completed && styles.completedSession,
+                event.inProgress && styles.inProgressSession,
+              ]}
+            >
               <MaterialCommunityIcons
-                name="timer-sand"
+                name={
+                  event.name === "Race"
+                    ? "racing-helmet"
+                    : event.name.includes("Qualifying")
+                    ? "timer"
+                    : "flag-checkered"
+                }
                 size={24}
-                color="#e10600"
+                color={
+                  event.inProgress
+                    ? "#fff"
+                    : event.completed
+                    ? "#4caf50"
+                    : "#e10600"
+                }
               />
-              <Text style={styles.infoCardTitle}>Sprint Qualy</Text>
-              <Text style={styles.infoCardValue}>
-                {formatTime(
-                  selectedRace.schedule.sprintQualy.date,
-                  selectedRace.schedule.sprintQualy.time
-                )}
+              <Text
+                style={[
+                  styles.infoCardTitle,
+                  event.inProgress && { color: "#fff" },
+                  event.completed && { color: "#4caf50" },
+                ]}
+              >
+                {event.name}
               </Text>
-              {isSessionCompleted("Sprint Qualifying") && (
+              <Text
+                style={[
+                  styles.infoCardValue,
+                  event.inProgress && { color: "#fff" },
+                  event.completed && { color: "#4caf50" },
+                ]}
+              >
+                {formatEventTime(event.date)}
+              </Text>
+              {event.completed && (
                 <Text style={styles.completedText}>Completed</Text>
               )}
-            </View>
-
-            <View style={styles.infoCard}>
-              <MaterialCommunityIcons
-                name="flag-checkered"
-                size={24}
-                color="#e10600"
-              />
-              <Text style={styles.infoCardTitle}>Sprint Race</Text>
-              <Text style={styles.infoCardValue}>
-                {formatTime(
-                  selectedRace.schedule.sprintRace.date,
-                  selectedRace.schedule.sprintRace.time
-                )}
-              </Text>
-              {isSessionCompleted("Sprint Race") && (
-                <Text style={styles.completedText}>Completed</Text>
+              {event.inProgress && (
+                <Text style={styles.inProgressText}>Live</Text>
               )}
             </View>
-          </>
-        )}
+          ))}
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Practice Sessions</Text>
         <View style={styles.practiceContainer}>
-          <View
-            style={[
-              styles.practiceSession,
-              isSessionCompleted("FP1") && styles.completedSession,
-            ]}
-          >
-            <Text style={styles.practiceTitle}>FP1</Text>
-            <Text style={styles.practiceTime}>
-              {formatTime(
-                selectedRace.schedule.fp1.date,
-                selectedRace.schedule.fp1.time
-              )}
-            </Text>
-            {isSessionCompleted("FP1") && (
-              <Text style={styles.completedText}>Completed</Text>
-            )}
-          </View>
-          {selectedRace.schedule.fp2.date && (
-            <View
-              style={[
-                styles.practiceSession,
-                isSessionCompleted("FP2") && styles.completedSession,
-              ]}
-            >
-              <Text style={styles.practiceTitle}>FP2</Text>
-              <Text style={styles.practiceTime}>
-                {formatTime(
-                  selectedRace.schedule.fp2.date,
-                  selectedRace.schedule.fp2.time
+          {raceEvents
+            .filter((event) => ["FP1", "FP2", "FP3"].includes(event.name))
+            .map((event) => (
+              <View
+                key={event.name}
+                style={[
+                  styles.practiceSession,
+                  event.completed && styles.completedSession,
+                  event.inProgress && styles.inProgressSession,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.practiceTitle,
+                    event.inProgress && { color: "#fff" },
+                    event.completed && { color: "#4caf50" },
+                  ]}
+                >
+                  {event.name}
+                </Text>
+                <Text
+                  style={[
+                    styles.practiceTime,
+                    event.inProgress && { color: "#fff" },
+                    event.completed && { color: "#4caf50" },
+                  ]}
+                >
+                  {formatEventTime(event.date)}
+                </Text>
+                {event.completed && (
+                  <Text style={styles.completedText}>Completed</Text>
                 )}
-              </Text>
-              {isSessionCompleted("FP2") && (
-                <Text style={styles.completedText}>Completed</Text>
-              )}
-            </View>
-          )}
-          {selectedRace.schedule.fp3.date && (
-            <View
-              style={[
-                styles.practiceSession,
-                isSessionCompleted("FP3") && styles.completedSession,
-              ]}
-            >
-              <Text style={styles.practiceTitle}>FP3</Text>
-              <Text style={styles.practiceTime}>
-                {formatTime(
-                  selectedRace.schedule.fp3.date,
-                  selectedRace.schedule.fp3.time
+                {event.inProgress && (
+                  <Text style={styles.inProgressText}>Live</Text>
                 )}
-              </Text>
-              {isSessionCompleted("FP3") && (
-                <Text style={styles.completedText}>Completed</Text>
-              )}
-            </View>
-          )}
+              </View>
+            ))}
         </View>
       </View>
 
@@ -410,8 +389,7 @@ const CurrentWeekInfo = () => {
             <Image
               style={styles.driverImage}
               source={{
-                uri:
-                  selectedRace.winner.url || "https://via.placeholder.com/80",
+                uri: selectedRace.winner.url || "https://placehold.co/600x400",
               }}
             />
             <View style={styles.winnerInfo}>

@@ -183,14 +183,43 @@ export const styles = StyleSheet.create({
     fontWeight: "500",
   },
   completedSession: {
-    backgroundColor: '#e8f5e9', // Light green background for completed sessions
-    borderColor: '#4caf50', // Green border
+    backgroundColor: "#e8f5e9",
+    borderColor: "#4caf50",
     borderWidth: 1,
   },
   completedText: {
-    color: '#4caf50', // Green text
-    fontWeight: 'bold',
+    color: "#4caf50",
+    fontWeight: "bold",
     marginTop: 5,
     fontSize: 12,
+  },
+  inProgressSession: {
+    backgroundColor: "#e10600",
+    borderColor: "#b71c1c",
+    borderWidth: 1,
+  },
+  inProgressText: {
+    color: "#fff",
+    fontWeight: "bold",
+    marginTop: 5,
+    fontSize: 12,
+  },
+  liveContainer: {
+    marginTop: 15,
+    backgroundColor: "#e10600",
+    borderRadius: 8,
+    padding: 12,
+    alignItems: "center",
+  },
+  liveText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  liveTimer: {
+    color: "#fff",
+    fontSize: 20,
+    fontWeight: "bold",
+    marginTop: 5,
   },
 });
