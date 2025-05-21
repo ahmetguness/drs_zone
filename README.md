@@ -37,4 +37,4 @@ This app uses data from F1 API( https://f1api.dev/docs/teams ). No authenticatio
 
 ## 🖼️ Screenshots
 
-![a](https://github.com/ahmetguness/drs_zone/blob/main/ScreenShots/ConstructorsStandingsScreen.png)
+https://github.com/ahmetguness/drs_zone/blob/main/ScreenShots/ConstructorsStandingsScreen.png
