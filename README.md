@@ -46,3 +46,9 @@ We're working on integrating a smart AI model into **DRS Zone** that will predic
 | ![Constructor Standings](./ScreenShots/ConstructorsStandingsScreen.png) | **Constructor Standings**<br/>Team rankings throughout the season |
 | ![Race Details 1](./ScreenShots/RaceDetailsScreen1.png) | **Race Details - 1**<br/>Detailed overview of a selected race including position, driver stats, and laps |
 | ![Race Details 2](./ScreenShots/RaceDetailsScreen2.png) | **Race Details - 2**<br/>Additional insights such as fastest lap, pit stops, and highlights |
+
+```bash
+git clone https://github.com/ahmetguness/drs-zone.git
+cd drs-zone
+npm install
+npx expo start
