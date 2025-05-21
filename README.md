@@ -34,7 +34,12 @@ npx expo start
 
 This app uses data from F1 API( https://f1api.dev/docs/teams ). No authentication key is required for public endpoints.
 
+## 🧠 Upcoming Feature: AI-Based Race Result Predictions
 
-## 🖼️ Screenshots
+We're working on integrating a smart AI model into **DRS Zone** that will predict upcoming race results based on historical data, driver performance, team statistics, and track-specific factors.
 
-https://github.com/ahmetguness/drs_zone/blob/main/ScreenShots/ConstructorsStandingsScreen.png
+### 🔮 What to Expect:
+- Machine learning model trained on past seasons and live data
+- Predictive analytics for podium finishes, fastest laps, and points
+- Visual insights and confidence scores for each prediction
+- Seamless integration into the race details screen
